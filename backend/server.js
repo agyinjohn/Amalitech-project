@@ -22,7 +22,7 @@ mongoose
   .connect(DB_URL)
   .then((res) => console.log("Successfull connection to database"))
   .catch((err) => {
-    console.log("Connection failed");
+    console.log("Connection faile");
   });
 // DB_URL.users.getIndexes();
 const port = process.env.PORT;
