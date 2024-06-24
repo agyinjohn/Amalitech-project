@@ -3,8 +3,8 @@ import axios from "axios";
 import videoService from "../services/videoService";
 const API_URL = "http://localhost:8000/api/videos";
 function VideoPage() {
-  const [video, setVideo] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [Videos, setVideos] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(2);
   const [videosLength, setVideosLength] = useState(0);
   useEffect(() => {
     loadVideo(currentIndex);
@@ -18,10 +18,10 @@ function VideoPage() {
         const videos = res.data;
         setVideosLength(videos.length);
         if (videos.length > 0 && index >= 0 && index < videos.length) {
-          setVideo(videos[index]);
+          setVideos(videos);
           console.log(videos);
         } else {
-          setVideo(null);
+          setVideos(null);
         }
       })
       .catch((err) => {
@@ -39,19 +39,19 @@ function VideoPage() {
 
   return (
     <div>
-      {video ? (
+      {videosLength > 0 ? (
         <div className="video-page">
           <header className="video-header">
             <img src="logo.png" alt="Business Logo" className="logo" />
           </header>
           <main className="video-container">
             <video controls className="video-player">
-              <source src={video.url} type="video/mp4" />
+              <source src={Videos[currentIndex].url} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
             <div className="video-info">
-              <h1>{video.title}</h1>
-              <p>{video.description}</p>
+              <h1>{Videos[currentIndex].title}</h1>
+              <p>{Videos[currentIndex].description}</p>
             </div>
             <div className="video-controls">
               {currentIndex > 0 && (
