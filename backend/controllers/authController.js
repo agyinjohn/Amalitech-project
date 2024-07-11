@@ -1,21 +1,20 @@
 const User = require("../models/UserModel");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 
 const {
   sendVerificationEmail,
   sendResetPasswordEmail,
 } = require("../utils/mailer");
 
-exports.signup = async (req, res) => {
+exports.signup = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser)
-      return res.json({
+      return res.status(400).json({
         message: "Please this email address is in use by another account",
       });
-    const user = User({ email, password });
+    const user = new User({ email, password });
     await user.save();
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
@@ -25,33 +24,43 @@ exports.signup = async (req, res) => {
       message: "User registered. Please check your email for verification.",
     });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    next(err); // Pass the error to the next middleware
   }
 };
 
-exports.verifyEmail = async (req, res) => {
+exports.verifyEmail = async (req, res, next) => {
   const { token } = req.params;
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const upadate = {
-      isVerified: true,
-    };
-    const options = {
-      new: true, // Return the updated document
-      runValidators: true, // Run validation on the update
-    };
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err) {
+        if (err.name === "TokenExpiredError") {
+          return res.status(400).json({
+            error:
+              "Token has expired. Please request a new verification email.",
+          });
+        }
+        return res.status(400).json({ error: "Invalid token." });
+      }
 
-    const user = await User.findByIdAndUpdate(decoded.id, upadate, options);
-    if (!user) throw new Error("Invalid token");
+      const update = {
+        isVerified: true,
+      };
+      const options = {
+        new: true, // Return the updated document
+        runValidators: true, // Run validation on the update
+      };
 
-    console.log(user);
-    res.status(200).json({ message: "Email verified successfully" });
+      const user = await User.findByIdAndUpdate(decoded.id, update, options);
+      if (!user) throw new Error("User not found.");
+
+      res.status(200).json({ message: "Email verified successfully" });
+    });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    next(err); // Pass the error to the next middleware
   }
 };
 
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
@@ -64,13 +73,13 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    res.status(200).json({ token });
+    res.status(200).json({ token, user });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    next(err); // Pass the error to the next middleware
   }
 };
 
-exports.resetPasswordRequest = async (req, res) => {
+exports.resetPasswordRequest = async (req, res, next) => {
   const { email } = req.body;
   try {
     const user = await User.findOne({ email });
@@ -81,24 +90,24 @@ exports.resetPasswordRequest = async (req, res) => {
     sendResetPasswordEmail(user.email, token);
     res.status(200).json({ message: "Password reset email sent" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    next(err); // Pass the error to the next middleware
   }
 };
 
-exports.resetPassword = async (req, res) => {
+exports.resetPassword = async (req, res, next) => {
   const { token, password } = req.body;
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
     if (!user) throw new Error("Invalid token");
     if (await user.matchPassword(password))
-      return res.json({
-        message: "Updated password cannot be equal the old password",
+      return res.status(400).json({
+        message: "Updated password cannot be equal to the old password",
       });
     user.password = password;
     await user.save();
     res.status(200).json({ message: "Password reset successful" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    next(err); // Pass the error to the next middleware
   }
 };

@@ -10,7 +10,7 @@ body {
   padding: 0;
   background: linear-gradient(to bottom right, #9be15d, #00e3ae);
   /* background: linear-gradient(135deg, #C33764 0%, #1D267 100%); */
-  min-height: 100vh;
+  min-height: 95vh;
 }
 /* #FDFCFB → #E2D1C3 */
 header {
@@ -333,9 +333,10 @@ button.forgot-password:hover {
 
 .video-player {
   width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  height: 100;
+  border: 2px solid #c33764;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .video-info {
@@ -403,4 +404,107 @@ button.forgot-password:hover {
   100% {
     transform: rotate(360deg);
   }
+}
+.vc {
+  width: 500px;
+  height: 20px;
+  margin: auto;
+  background-color: #1d2671;
+  background-size: contain;
+}
+.video {
+  height: 300px;
+  width: 700px;
+  background-color: black;
+  background-size: cover;
+}
+.landing {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  text-align: center;
+}
+
+.landing-main {
+  flex: 1;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+}
+
+.landing-main h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.landing-main p {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 20px;
+}
+.landing-footer {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: white;
+  text-align: center;
+  width: 100%;
+  background-color: yellowgreen;
+  padding: 10px 0;
+}
+
+footer {
+  padding: 20px;
+  background-color: blue;
+  color: white;
+  text-align: center;
+  width: 100%;
+  position: sticky;
+  bottom: 0;
+}
+.landing .content-l {
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+.content-l a {
+  text-decoration: none;
+  padding: 10px;
+  border: 1px solid #1d2677;
+  margin-top: 10px;
+  background-color: wheat;
+}
+.video-content {
+  margin: 30px auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.video-container-v {
+  width: 100%;
+  max-width: 800px;
+  height: 300px;
+  /* Ensure the container stretches to the desired height */
+  max-height: 700px;
+  margin: 0 auto;
+}
+
+.video-element {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Stretch video to fill the container while maintaining aspect ratio */
+  display: block;
+}
+
+.des {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

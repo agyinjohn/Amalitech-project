@@ -2,12 +2,17 @@ import React, { useState } from "react";
 import axios from "axios";
 import CustomAlert from "./CustomAlert";
 import LoadingIndicator from "./LoadingIndicator";
+import { useAuth } from "./AuthContext";
+import { useNavigate } from "react-router-dom";
 const API_URL = "http://localhost:8000/api/login";
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [alert, setAlert] = useState({ show: false, message: "" });
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
   const triggerAlert = (message) => {
     setAlert({ show: true, message: `${message}!` });
   };
@@ -24,11 +29,19 @@ function LoginPage() {
       .post(`${API_URL}`, { email, password })
       .then((res) => {
         setIsLoading(false);
-        triggerAlert(res.data.message);
+        console.log(res.data.token);
+        triggerAlert("Successful login");
+        const token = res.data.token;
+        // Example token, replace with actual token from your login logic
+        const user = { email, name: "John Doe", role: "admin" }; // Example user data, replace with actual data from your login logic
+        login(token, user);
+
+        navigate("/");
       })
       .catch((err) => {
         setIsLoading(false);
-        triggerAlert(err.response.data.error);
+        console.log(err);
+        triggerAlert(err.response.data.message);
       });
   };
 

@@ -4,7 +4,7 @@ const admin = require("firebase-admin");
 const path = require("path");
 
 // Initialize Firebase Admin SDK
-const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+const serviceAccount = require("../utils/config/firebaseServiceAccount.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -20,7 +20,7 @@ const upload = multer({ storage });
 // Middleware for video upload
 exports.uploadVideo = [
   upload.single("video"),
-  async (req, res) => {
+  async (req, res, next) => {
     const { title, description } = req.body;
     const videoFile = req.file;
 
@@ -33,11 +33,6 @@ exports.uploadVideo = [
     )}`;
     const file = bucket.file(fileName);
 
-    // const stream = file.createWriteStream({
-    //   metadata: {
-    //     contentType: videoFile.mimetype,
-    //   },
-    // });
     const stream = file.createWriteStream({
       metadata: {
         contentType: videoFile.mimetype, // Set content type to ensure proper handling
@@ -68,8 +63,7 @@ exports.uploadVideo = [
         });
         res.status(201).json(video);
       } catch (err) {
-        console.error(err);
-        res.status(500).send("Error saving video data to database");
+        next(err); // Pass the error to the next middleware
       }
     });
 
@@ -77,61 +71,7 @@ exports.uploadVideo = [
   },
 ];
 
-// Controller function to stream video
-// exports.streamVideo = async (req, res) => {
-//   try {
-//     const videoId = req.params.id; // Get the video ID from the request parameters
-//     const video = await Video.findById(videoId); // Find the video in the database by ID
-
-//     if (!video) {
-//       return res.status(404).send("Video not found"); // Return 404 if the video is not found
-//     }
-
-//     const file = bucket.file(video.url.split("/").pop()); // Get the file from the bucket using the URL
-//     console.log(file);
-//     // Get metadata for the file to determine its size
-//     file
-//       .getMetadata()
-//       .then((data) => {
-//         const fileSize = data[0].size; // Get the file size from the metadata
-//         const range = req.headers.range; // Get the range header from the request
-
-//         if (!range) {
-//           return res.status(400).send("Requires Range header"); // Return 400 if range header is missing
-//         }
-
-//         const CHUNK_SIZE = 10 ** 6; // Set chunk size to 1MB
-//         const start = Number(range.replace(/\D/g, "")); // Get the start byte from the range header
-//         const end = Math.min(start + CHUNK_SIZE, fileSize - 1); // Calculate the end byte
-
-//         const contentLength = end - start + 1; // Calculate the content length
-//         const headers = {
-//           "Content-Range": `bytes ${start}-${end}/${fileSize}`, // Set the Content-Range header
-//           "Accept-Ranges": "bytes", // Indicate that bytes can be requested
-//           "Content-Length": contentLength, // Set the content length
-//           "Content-Type": "video/mp4", // Set the content type to video/mp4
-//         };
-
-//         res.writeHead(206, headers); // Write the headers with status 206 (Partial Content)
-
-//         const stream = file.createReadStream({
-//           start, // Start byte
-//           end, // End byte
-//         });
-
-//         stream.pipe(res); // Pipe the stream to the response
-//       })
-//       .catch((err) => {
-//         // console.error(err);
-//         res.status(500).send("Error retrieving video metadata"); // Return 500 if there is an error retrieving metadata
-//       });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send("Server error"); // Return 500 if there is a server error
-//   }
-// };
-
-exports.streamVideo = async (req, res) => {
+exports.streamVideo = async (req, res, next) => {
   try {
     const videoId = req.params.id; // Get the video ID from the request parameters
     const video = await Video.findById(videoId); // Find the video in the database by ID
@@ -140,49 +80,46 @@ exports.streamVideo = async (req, res) => {
       return res.status(404).send("Video not found"); // Return 404 if the video is not found
     }
     const url = video.url.split("/").pop();
-    // console.log(url);
     const file = bucket.file(`videos/${url}`); // Get the file from the bucket using the URL
     if (!file) {
-      console.log(url);
-      return res.status(404).send("file not found");
+      return res.status(404).send("File not found");
     }
-    const range = req.headers.range; // Get the range header from the request
+    let range = req.headers.range; // Get the range header from the request
+
+    const [metadata] = await file.getMetadata();
+    const fileSize = metadata.size;
 
     if (!range) {
-      return res.status(400).send("Requires Range header"); // Return 400 if range header is missing
+      const defaultChunkSize = 10 ** 6; // 1MB
+      range = `bytes=0-${defaultChunkSize - 1}`;
     }
 
-    const CHUNK_SIZE = 10 ** 6; // Set chunk size to 1MB
-    const start = Number(range.replace(/\D/g, "")); // Get the start byte from the range header
-    const end = start + CHUNK_SIZE; // Calculate the end byte
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
 
-    const stream = file.createReadStream({
-      start, // Start byte
-      end, // End byte
-    });
-
-    const headers = {
-      "Content-Range": `bytes ${start}-${end}/*`, // Set the Content-Range header with wildcard for total length
-      "Accept-Ranges": "bytes", // Indicate that bytes can be requested
-      "Content-Type": "video/mp4", // Set the content type to video/mp4
+    const chunksize = end - start + 1;
+    const head = {
+      "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": chunksize,
+      "Content-Type": "video/mp4",
     };
 
-    res.writeHead(206, headers); // Write the headers with status 206 (Partial Content)
-    stream.pipe(res); // Pipe the stream to the response
+    res.writeHead(206, head);
 
-    // stream.on("error", (err) => {
-    //   console.error(err);
-    //   return res
-    //     .status(500)
-    //     .send("Error streaming video from Firebase Storage");
-    // });
+    file
+      .createReadStream({
+        start,
+        end,
+      })
+      .pipe(res);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error"); // Return 500 if there is a server error
+    next(err); // Pass the error to the next middleware
   }
 };
 
-exports.listVideos = async (req, res) => {
+exports.listVideos = async (req, res, next) => {
   try {
     const videos = await Video.find();
     if (!videos.length) {
@@ -190,8 +127,6 @@ exports.listVideos = async (req, res) => {
     }
     res.status(200).json(videos);
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error retrieving videos", error: err.message });
+    next(err); // Pass the error to the next middleware
   }
 };

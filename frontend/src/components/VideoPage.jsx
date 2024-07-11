@@ -1,78 +1,96 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import videoService from "../services/videoService";
+import logo from "../assets/Bespoke.png";
+import { useParams, useNavigate } from "react-router-dom";
+import VideoWidget from "./videoPlayer";
 const API_URL = "http://localhost:8000/api/videos";
-function VideoPage() {
-  const [Videos, setVideos] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(2);
-  const [videosLength, setVideosLength] = useState(0);
-  useEffect(() => {
-    loadVideo(currentIndex);
-  }, [currentIndex]);
 
-  const loadVideo = async (index) => {
-    axios
-      .get(`${API_URL}/listVideos`)
-      .then((res) => {
-        console.log(res);
-        const videos = res.data;
-        setVideosLength(videos.length);
-        if (videos.length > 0 && index >= 0 && index < videos.length) {
-          setVideos(videos);
-          console.log(videos);
-        } else {
-          setVideos(null);
-        }
+function VideoPage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [Index, setIndex] = useState(0);
+  const [videos, setVideos] = useState([]);
+  const [videoIds, setVideoIds] = useState([]);
+  const [url, setUrl] = useState(`${API_URL}/stream/${id}`);
+
+  useEffect(() => {
+    // Fetch the list of all video IDs
+    fetch("http://localhost:8000/api/videos/listVideos")
+      .then((response) => response.json())
+      .then((data) => {
+        setVideos(data);
+        console.log(data);
+        setVideoIds(data.map((video) => video._id));
       })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+      .catch((error) => console.error("Error fetching video IDs:", error));
+  }, []);
+
+  useEffect(() => {
+    setUrl(`${API_URL}/stream/${id}`);
+    console.log(url);
+    console.log(id);
+  }, [id]);
 
   const handleNext = () => {
-    setCurrentIndex(currentIndex + 1);
+    const currentIndex = videoIds.indexOf(id);
+    setIndex(currentIndex);
+    if (currentIndex !== -1 && currentIndex < videoIds.length - 1) {
+      navigate(`/videos/video/${videoIds[currentIndex + 1]}`);
+    }
   };
 
   const handlePrevious = () => {
-    setCurrentIndex(currentIndex - 1);
+    const currentIndex = videoIds.indexOf(id);
+    setIndex(currentIndex);
+    if (currentIndex > 0) {
+      navigate(`/videos/video/${videoIds[currentIndex - 1]}`);
+    }
   };
 
+  const copyToClipboard = (text) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        alert("Copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+      });
+  };
+
+  if (videos.length < 1) {
+    return <p>Loading....</p>;
+  }
+
   return (
-    <div>
-      {videosLength > 0 ? (
-        <div className="video-page">
-          <header className="video-header">
-            <img src="logo.png" alt="Business Logo" className="logo" />
-          </header>
-          <main className="video-container">
-            <video controls className="video-player">
-              <source src={Videos[currentIndex].url} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-            <div className="video-info">
-              <h1>{Videos[currentIndex].title}</h1>
-              <p>{Videos[currentIndex].description}</p>
-            </div>
-            <div className="video-controls">
-              {currentIndex > 0 && (
-                <button onClick={handlePrevious}>Previous</button>
-              )}
-              {currentIndex < videosLength && (
-                <button onClick={handleNext}>Next</button>
-              )}
-              <button
-                onClick={() =>
-                  navigator.clipboard.writeText(window.location.href)
-                }
-              >
-                Share
-              </button>
-            </div>
-          </main>
-        </div>
-      ) : (
-        <p>No video available</p>
-      )}
+    <div className="video-content">
+      <img src={logo} alt="Description" height="150px" width="150px" />
+      <VideoWidget src={url} />
+      <div className="des">
+        <h1> {videos[Index].title} </h1>
+        <p> {videos[Index].description} </p>
+      </div>
+      <div>
+        {videoIds.indexOf(id) > 0 && (
+          <button
+            onClick={handlePrevious}
+            disabled={videoIds.indexOf(id) === 0}
+          >
+            Previous
+          </button>
+        )}
+        {videoIds.indexOf(id) < videoIds.length - 1 && (
+          <button
+            onClick={handleNext}
+            disabled={videoIds.indexOf(id) === videoIds.length - 1}
+          >
+            Next
+          </button>
+        )}
+        <button onClick={() => copyToClipboard(videos[Index].url)}>
+          Share
+        </button>
+      </div>
     </div>
   );
 }
