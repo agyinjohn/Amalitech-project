@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 .env
 *config
-/utils/config/firebaseServiceAccount.json
+# /utils/config/firebaseServiceAccount.json
