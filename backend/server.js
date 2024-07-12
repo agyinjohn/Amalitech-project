@@ -36,9 +36,9 @@ mongoose
   });
 // DB_URL.users.getIndexes();
 
-// app.get("*", (req, res) => {
-//   res.sendFile(path.resolve(__dirname, "index.html"));
-// });
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "index.html"));
+});
 
 app.use(errorHandler);
 const port = process.env.PORT;
