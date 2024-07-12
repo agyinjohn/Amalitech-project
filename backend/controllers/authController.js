@@ -65,15 +65,18 @@ exports.login = async (req, res, next) => {
   try {
     const user = await User.findOne({ email });
     if (!user || !(await user.matchPassword(password))) {
-      throw new Error("Invalid email or password");
+      return res.status(400).json({ message: "Invalid email or password" });
     }
     if (!user.isVerified) {
-      throw new Error("Email not verified");
+      return res.status(400).json({ message: "Email not verified" });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    res.status(200).json({ token, user });
+
+    const { password: userPassword, ...userWithoutPassword } = user.toObject();
+
+    res.status(200).json({ token, user: userWithoutPassword });
   } catch (err) {
     next(err); // Pass the error to the next middleware
   }

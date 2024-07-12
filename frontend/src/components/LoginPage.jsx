@@ -29,11 +29,15 @@ function LoginPage() {
       .post(`${API_URL}`, { email, password })
       .then((res) => {
         setIsLoading(false);
-        console.log(res.data.token);
+        console.log(res.data.user);
         triggerAlert("Successful login");
         const token = res.data.token;
         // Example token, replace with actual token from your login logic
-        const user = { email, name: "John Doe", role: "admin" }; // Example user data, replace with actual data from your login logic
+        const user = {
+          email: res.data.user.email,
+          name: res.data.user.name,
+          role: res.data.user.role,
+        }; // Example user data, replace with actual data from your login logic
         login(token, user);
 
         navigate("/");
@@ -46,7 +50,7 @@ function LoginPage() {
   };
 
   const handleForgotPassword = () => {
-    //   onForgotPassword(email);
+    navigate("/reset-password");
   };
 
   return (

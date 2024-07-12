@@ -13,7 +13,7 @@ function Header() {
 
   return (
     <nav className="navbar">
-      <div className="navbar-logo">VideoPlatform</div>
+      <div className="navbar-logo">Bespoke</div>
       <ul className="navbar-nav">
         {isAuthenticated && (
           <li className="nav-item">
@@ -22,7 +22,7 @@ function Header() {
             </NavLink>
           </li>
         )}
-        {isAuthenticated && user && user.role === "admin" && (
+        {isAuthenticated && user.role === "admin" && (
           <li className="nav-item">
             <NavLink to="/upload" activeclassname="active">
               Upload

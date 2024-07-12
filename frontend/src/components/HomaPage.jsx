@@ -5,16 +5,32 @@ import { Link } from "react-router-dom";
 const HomaPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [id, setId] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const fetchVideos = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem("token"); // Retrieve the token from localStorage
+      const res = await axios.get(
+        "http://localhost:8000/api/videos/listVideos",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+          },
+        }
+      );
+      setId(res.data[currentIndex]["_id"]);
+      setIsLoading(false);
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+    }
+  };
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/videos/listVideos")
-      .then((res) => setId(res.data[currentIndex]["_id"]))
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
+    fetchVideos();
+  }, [currentIndex]);
+  if (isLoading) {
+    return <h1>Loading......</h1>;
+  }
   return (
     <div>
       <div className="landing">
@@ -23,7 +39,11 @@ const HomaPage = () => {
         </main>
         <div className="content-l">
           <p>Your go-to place for exclusive videos.</p>
-          <Link to={`/videos/video/${id}`} className="button">
+          <Link
+            onClick={console.log("click")}
+            to={`/videos/video/${id}`}
+            className="button"
+          >
             Watch videos
           </Link>
         </div>
