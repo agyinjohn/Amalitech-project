@@ -15,7 +15,7 @@ const app = express();
 // console.log(jwtSecret);
 //Middlewares for security purposes
 const corsOptions = {
-  origin: "http://localhost:5173", // Allow both ports
+  origin: "https://6690b9a8e471f9c7493fb8c4--cute-cuchufli-b9e947.netlify.app", // Allow both ports
   methods: ["GET", "POST"], // Allowed methods
   allowedHeaders: ["Content-Type"], // Allowed headers
   credentials: true, // Allow cookies to be sent
