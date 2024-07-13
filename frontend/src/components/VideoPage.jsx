@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import logo from "../assets/Bespoke.png";
 import { useParams, useNavigate } from "react-router-dom";
 import VideoWidget from "./videoPlayer";
-const API_URL = "http://localhost:8000/api/videos";
+const API_URL = "https://amalitech-project-6652.onrender.com/api/videos";
 
 function VideoPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,7 +15,12 @@ function VideoPage() {
 
   useEffect(() => {
     // Fetch the list of all video IDs
-    fetch("http://localhost:8000/api/videos/listVideos")
+    const token = localStorage.getItem("token");
+    fetch("https://amalitech-project-6652.onrender.com/api/videos/listVideos", {
+      headers: {
+        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
         setVideos(data);

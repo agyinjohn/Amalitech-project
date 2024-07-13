@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import CustomAlert from "./CustomAlert";
-const API_URL = "http://localhost:8000/api/";
+const API_URL = "https://amalitech-project-6652.onrender.com/api/";
 function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +30,7 @@ function SignUpPage() {
         triggerAlert(res.data.message);
       })
       .catch((err) => {
-        triggerAlert(err.response.data.error);
+        triggerAlert(err.response.data.error.message);
       });
   };
 

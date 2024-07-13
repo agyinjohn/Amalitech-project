@@ -8,7 +8,9 @@ const VerifiedEmailPage = () => {
   useEffect(() => {
     console.log(token);
     axios
-      .get(`http://localhost:8000/api/verify-email/${token}`)
+      .get(
+        `https://amalitech-project-6652.onrender.com/api/verify-email/${token}`
+      )
       .then((res) => setMessage(res.message))
       .catch((err) => setMessage(err.response.data.error));
   });

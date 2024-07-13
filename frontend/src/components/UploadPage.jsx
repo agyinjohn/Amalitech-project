@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import videoService from "../services/videoService";
-// Import the CSS file for the UploadPage styles
+import "./UploadPage.css";
 
 function UploadPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [videoFile, setVideoFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleFileChange = (e) => {
     setVideoFile(e.target.files[0]);
@@ -17,11 +19,16 @@ function UploadPage() {
     formData.append("description", description);
     formData.append("video", videoFile);
 
+    setLoading(true);
+    setError(null);
+
     try {
       await videoService.uploadVideo(formData);
-      //   alert("Video uploaded successfully");
+      alert("Video uploaded successfully");
     } catch (error) {
-      //   alert("Error uploading video");
+      setError("Error uploading video");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,6 +42,7 @@ function UploadPage() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            disabled={loading}
           />
         </div>
         <div className="form-group">
@@ -42,16 +50,23 @@ function UploadPage() {
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            disabled={loading}
           ></textarea>
         </div>
         <div className="form-group">
           <label>Video File</label>
-          <input type="file" onChange={handleFileChange} accept="video/*" />
+          <input
+            type="file"
+            onChange={handleFileChange}
+            accept="video/*"
+            disabled={loading}
+          />
         </div>
-        <button type="button" onClick={handleUpload}>
-          Upload
+        <button type="button" onClick={handleUpload} disabled={loading}>
+          {loading ? "Uploading..." : "Upload"}
         </button>
       </form>
+      {error && <p className="error">{error}</p>}
     </div>
   );
 }

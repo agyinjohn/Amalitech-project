@@ -41,7 +41,9 @@ app.get("*", (req, res) => {
 });
 
 app.use(errorHandler);
-const port = process.env.PORT;
+const port = process.env.PORT || 8001;
 app.listen(port, () => {
   console.log(`Server is listen on port ${port}`);
 });
+
+module.exports = app;

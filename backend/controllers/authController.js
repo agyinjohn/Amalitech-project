@@ -81,7 +81,7 @@ exports.login = async (req, res, next) => {
     next(err); // Pass the error to the next middleware
   }
 };
-
+//ask t change your password following an email for redirect
 exports.resetPasswordRequest = async (req, res, next) => {
   const { email } = req.body;
   try {
@@ -96,7 +96,7 @@ exports.resetPasswordRequest = async (req, res, next) => {
     next(err); // Pass the error to the next middleware
   }
 };
-
+// user receive an email message and changes the password
 exports.resetPassword = async (req, res, next) => {
   const { token, password } = req.body;
   try {

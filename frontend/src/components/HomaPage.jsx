@@ -11,7 +11,7 @@ const HomaPage = () => {
       setIsLoading(true);
       const token = localStorage.getItem("token"); // Retrieve the token from localStorage
       const res = await axios.get(
-        "http://localhost:8000/api/videos/listVideos",
+        "https://amalitech-project-6652.onrender.com/api/videos/listVideos",
         {
           headers: {
             Authorization: `Bearer ${token}`, // Include the token in the Authorization header

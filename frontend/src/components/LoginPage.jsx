@@ -4,7 +4,9 @@ import CustomAlert from "./CustomAlert";
 import LoadingIndicator from "./LoadingIndicator";
 import { useAuth } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
-const API_URL = "http://localhost:8000/api/login";
+
+const API_URL = "https://amalitech-project-6652.onrender.com/api/login";
+
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,10 +22,9 @@ function LoginPage() {
   const closeAlert = () => {
     setAlert({ show: false, message: "" });
   };
+
   const handleLogin = (e) => {
     e.preventDefault();
-    // Add your login logic here
-    // onLogin(email, password);
     setIsLoading(true);
     axios
       .post(`${API_URL}`, { email, password })
@@ -32,20 +33,18 @@ function LoginPage() {
         console.log(res.data.user);
         triggerAlert("Successful login");
         const token = res.data.token;
-        // Example token, replace with actual token from your login logic
         const user = {
           email: res.data.user.email,
           name: res.data.user.name,
           role: res.data.user.role,
-        }; // Example user data, replace with actual data from your login logic
+        };
         login(token, user);
-
         navigate("/");
       })
       .catch((err) => {
         setIsLoading(false);
         console.log(err);
-        triggerAlert(err.response.data.message);
+        triggerAlert(err.response.data.message || "Error logging in");
       });
   };
 
@@ -72,6 +71,7 @@ function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             <div className="form-group">
@@ -81,15 +81,17 @@ function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
-            <button type="submit">
+            <button type="submit" disabled={isLoading}>
               {isLoading ? <LoadingIndicator /> : "Login"}
             </button>
             <button
               type="button"
               className="forgot-password"
               onClick={handleForgotPassword}
+              disabled={isLoading}
             >
               Forgot Password?
             </button>

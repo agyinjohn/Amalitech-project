@@ -20,6 +20,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/reset-password:token" element={<ResetPasswordPage />} />
             <Route
               path="/verify-email/:token"
               element={<VerifiedEmailPage />}

@@ -1,23 +1,37 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
-import authService from "../services/authService";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
 function ResetPasswordPage() {
-  const [email, setEmail] = useState("");
+  const { token } = useParams();
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const history = useHistory();
+  const [success, setSuccess] = useState(false);
 
   const handleResetPassword = async () => {
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     setLoading(true);
     setError(null);
+    setSuccess(false);
 
     try {
-      await authService.resetPasswordRequest(email);
-      alert("Password reset email sent");
-      history.push("/");
+      await axios.post(
+        "https://amalitech-project-6652.onrender.com/api/reset-password",
+        {
+          token,
+          password: newPassword,
+        }
+      );
+      setSuccess(true);
+      alert("Password reset successful");
     } catch (error) {
-      setError("Error sending password reset email");
+      setError("Error resetting password");
     } finally {
       setLoading(false);
     }
@@ -60,7 +74,6 @@ function ResetPasswordPage() {
       fontSize: "14px",
       borderRadius: "4px",
       border: "1px solid #ddd",
-      disabled: loading,
     },
     button: {
       padding: "10px 20px",
@@ -71,13 +84,16 @@ function ResetPasswordPage() {
       borderRadius: "4px",
       cursor: "pointer",
       marginTop: "10px",
-      disabled: loading,
     },
     buttonHover: {
       backgroundColor: "#0056b3",
     },
     error: {
       color: "red",
+      marginTop: "10px",
+    },
+    success: {
+      color: "green",
       marginTop: "10px",
     },
   };
@@ -88,11 +104,21 @@ function ResetPasswordPage() {
         <h2 style={styles.header}>Reset Password</h2>
         <form onSubmit={(e) => e.preventDefault()}>
           <div style={styles.formGroup}>
-            <label style={styles.label}>Email</label>
+            <label style={styles.label}>New Password</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              style={styles.input}
+              disabled={loading}
+            />
+          </div>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Confirm New Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               style={styles.input}
               disabled={loading}
             />
@@ -102,12 +128,10 @@ function ResetPasswordPage() {
             onClick={handleResetPassword}
             style={styles.button}
             onMouseOver={(e) =>
-              !loading &&
               (e.target.style.backgroundColor =
                 styles.buttonHover.backgroundColor)
             }
             onMouseOut={(e) =>
-              !loading &&
               (e.target.style.backgroundColor = styles.button.backgroundColor)
             }
             disabled={loading}
@@ -116,6 +140,7 @@ function ResetPasswordPage() {
           </button>
         </form>
         {error && <p style={styles.error}>{error}</p>}
+        {success && <p style={styles.success}>Password reset successful</p>}
       </div>
     </div>
   );
