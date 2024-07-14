@@ -55,11 +55,11 @@ Paul Leonard, a video creator, required a bespoke video hosting platform tailore
 
 ## User Authentication
 
-     *  POST /api/signup - Register a new user.
-     * POST /api/users/login - Log in a user.
-     * GET /api/verify-email/:token - Verify a user account.
-     * POST /api/reset-password-request - Request to change password.
-     * POST /api/users/reset-password - Reset user password.
+- POST /api/signup - Register a new user.
+- POST /api/users/login - Log in a user.
+- GET /api/verify-email/:token - Verify a user account.
+- POST /api/reset-password-request - Request to change password.
+- POST /api/users/reset-password - Reset user password.
 
 ## Video Management
 
@@ -69,12 +69,9 @@ Paul Leonard, a video creator, required a bespoke video hosting platform tailore
 
 # ER-DIAGRAM
 
-    @startuml
-
 entity User {
 
-- user_id : INT
-  --
+- ## user_id : INT
   email : VARCHAR
   password : VARCHAR
   is_verified : BOOLEAN
@@ -83,8 +80,7 @@ entity User {
 
 entity Video {
 
-- video_id : INT
-  --
+- ## video_id : INT
   title : VARCHAR
   description : TEXT
   url : VARCHAR
@@ -93,8 +89,7 @@ entity Video {
 
 entity Admin {
 
-- admin_id : INT
-  --
+- ## admin_id : INT
   user_id : INT
   }
 
