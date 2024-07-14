@@ -17,39 +17,39 @@ Paul Leonard, a video creator, required a bespoke video hosting platform tailore
 
 ## User Features
 
-     * Sign up and log in with email and password.
-     * Account verification via email.
-     * Password recovery feature.
-     * Navigate through video pages.
-     * Share links to videos.
+- Sign up and log in with email and password.
+- Account verification via email.
+- Password recovery feature.
+- Navigate through video pages.
+- Share links to videos.
 
 ## Admin Features
 
-     * Upload videos with title and description.
+- Upload videos with title and description.
 
 ## Video Page Features
 
-     * Display a single video.
-     * Navigation controls (next and previous buttons).
-     * Business logo at the top.
-     * Share button for sharing video links.
+- Display a single video.
+- Navigation controls (next and previous buttons).
+- Business logo at the top.
+- Share button for sharing video links.
 
 ## Technologies Used
 
-     *  Frontend: React.js
-     *  Backend: Node.js, Express.js
-     *  Database: MongoDB
-     *  Storage: Firebase
-     * Authentication: JSON Web Tokens (JWT)
-     *  Styling: normal CSS
+- Frontend: React.js
+- Backend: Node.js, Express.js
+- Database: MongoDB
+- Storage: Firebase
+- Authentication: JSON Web Tokens (JWT)
+- Styling: normal CSS
 
 ## Installation
 
-     * Prerequisites
-     *  Node.js (>=14.x)
-     *  npm (>=6.x)
-     *  MongoDB
-     * Firebase account
+- Prerequisites
+- Node.js (>=14.x)
+- npm (>=6.x)
+- MongoDB
+- Firebase account
 
 # API Endpoints
 
@@ -63,9 +63,9 @@ Paul Leonard, a video creator, required a bespoke video hosting platform tailore
 
 ## Video Management
 
-     * POST /api/videos/upload - Upload a new video - only admin.
-     * GET /api/videos/listVideos - Get all videos.
-     * GET /api/videos/stream/:id - Get all videos.
+- POST /api/videos/upload - Upload a new video - only admin.
+- GET /api/videos/listVideos - Get all videos.
+- GET /api/videos/stream/:id - Get all videos.
 
 # ER-DIAGRAM
 
