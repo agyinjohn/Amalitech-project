@@ -21,7 +21,7 @@ const corsOptions = {
   credentials: true, // Allow cookies to be sent
 };
 
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use(helmet());
 app.use("/api", router);
