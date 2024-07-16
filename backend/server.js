@@ -15,13 +15,13 @@ const app = express();
 // console.log(jwtSecret);
 //Middlewares for security purposes
 const corsOptions = {
-  origin: "https://6690b9a8e471f9c7493fb8c4--cute-cuchufli-b9e947.netlify.app", // Allow both ports
+  origin: "https://66969e37c89110de29a269ea--cute-cuchufli-b9e947.netlify.app", // Allow both ports
   methods: ["GET", "POST"], // Allowed methods
   allowedHeaders: ["Content-Type"], // Allowed headers
   credentials: true, // Allow cookies to be sent
 };
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(helmet());
 app.use("/api", router);
