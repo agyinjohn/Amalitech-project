@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import authService from "../services/authService";
 
 function ResetPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleResetPassword = async () => {
     setLoading(true);
@@ -15,7 +15,7 @@ function ResetPasswordPage() {
     try {
       await authService.resetPasswordRequest(email);
       alert("Password reset email sent");
-      history.push("/");
+      navigate("/");
     } catch (error) {
       setError("Error sending password reset email");
     } finally {
