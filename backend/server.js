@@ -16,8 +16,7 @@ const app = express();
 //Middlewares for security purposes
 const corsOptions = {
   origin: "https://66969e37c89110de29a269ea--cute-cuchufli-b9e947.netlify.app", // Allow both ports
-  methods: ["GET", "POST"], // Allowed methods
-  allowedHeaders: ["Content-Type"], // Allowed headers
+
   credentials: true, // Allow cookies to be sent
 };
 

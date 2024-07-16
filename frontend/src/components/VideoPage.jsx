@@ -1,73 +1,39 @@
 import React, { useState, useEffect } from "react";
 import logo from "../assets/Bespoke.png";
 import { useParams, useNavigate } from "react-router-dom";
+import VideoWidget from "./videoPlayer";
 const API_URL = "https://amalitech-project-6652.onrender.com/api/videos";
 
 function VideoPage() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
-  const [index, setIndex] = useState(0);
+  const [Index, setIndex] = useState(0);
   const [videos, setVideos] = useState([]);
   const [videoIds, setVideoIds] = useState([]);
-  const [videoSrc, setVideoSrc] = useState("");
-  const fetchVideo = async (videoId) => {
-    const token = localStorage.getItem("token");
-    const response = await fetch(
-      `https://amalitech-project-6652.onrender.com/api/videos/stream/${videoId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch video");
-    }
-
-    const blob = await response.blob();
-    return URL.createObjectURL(blob);
-  };
+  const [url, setUrl] = useState(`${API_URL}/stream/${id}`);
 
   useEffect(() => {
     // Fetch the list of all video IDs
     const token = localStorage.getItem("token");
-    if (token) {
-      fetch(
-        "https://amalitech-project-6652.onrender.com/api/videos/listVideos",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-          },
-        }
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          setVideos(data);
-          setVideoIds(data.map((video) => video._id));
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching video IDs:", error);
-          setIsLoading(false);
-        });
-    }
-  }, []); // Empty dependency array ensures this runs only once after initial render
+    fetch("https://amalitech-project-6652.onrender.com/api/videos/listVideos", {
+      headers: {
+        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setVideos(data);
+        console.log(data);
+        setVideoIds(data.map((video) => video._id));
+      })
+      .catch((error) => console.error("Error fetching video IDs:", error));
+  }, []);
 
   useEffect(() => {
-    const fetchAndSetVideo = async () => {
-      try {
-        const videoUrl = await fetchVideo(id);
-        setVideoSrc(videoUrl);
-      } catch (error) {
-        console.error("Error fetching video:", error);
-      }
-    };
-
-    if (id) {
-      fetchAndSetVideo();
-    }
+    setUrl(`${API_URL}/stream/${id}`);
+    console.log(url);
+    console.log(id);
   }, [id]);
 
   const handleNext = () => {
@@ -97,23 +63,17 @@ function VideoPage() {
       });
   };
 
-  if (isLoading) {
-    return (
-      <div className="loading-indicator">
-        <p>Loading...</p>
-      </div>
-    );
+  if (videos.length < 1) {
+    return <p>Loading....</p>;
   }
 
   return (
     <div className="video-content">
       <img src={logo} alt="Description" height="150px" width="150px" />
-      <video controls src={videoSrc} style={{ width: "100%", height: "auto" }}>
-        Your browser does not support the video tag.
-      </video>
+      <VideoWidget src={url} />
       <div className="des">
-        <h1>{videos[index]?.title}</h1>
-        <p>{videos[index]?.description}</p>
+        <h1> {videos[Index].title} </h1>
+        <p> {videos[Index].description} </p>
       </div>
       <div>
         {videoIds.indexOf(id) > 0 && (
@@ -132,7 +92,7 @@ function VideoPage() {
             Next
           </button>
         )}
-        <button onClick={() => copyToClipboard(videos[index]?.url)}>
+        <button onClick={() => copyToClipboard(videos[Index].url)}>
           Share
         </button>
       </div>
