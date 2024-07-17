@@ -1,0 +1,148 @@
+{
+  "info": {
+    "_postman_id": "6decf905-6228-4719-a134-f8cb94a1d98d",
+    "name": "Bespoke",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33128322"
+  },
+  "item": [
+    {
+      "name": "register user",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"agyinjohn1005@gmail.com\",\n    \"password\": \"UZZIAHpop@90\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/signup",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "signup"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "verify email",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/api/verify-email/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NzZjZDM3NWViNGNhMDliNzg3NGRiMyIsImlhdCI6MTcxOTA2MTgxNiwiZXhwIjoxNzE5MDY1NDE2fQ.pNvTcQA-49jX7OUBr6cfRMRLw0xGhoUh-VaPw-U4gMM",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": [
+            "api",
+            "verify-email",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NzZjZDM3NWViNGNhMDliNzg3NGRiMyIsImlhdCI6MTcxOTA2MTgxNiwiZXhwIjoxNzE5MDY1NDE2fQ.pNvTcQA-49jX7OUBr6cfRMRLw0xGhoUh-VaPw-U4gMM"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "reset_pass_req",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"agyinjohn100@gmail.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8000/api//reset-password-request",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "", "reset-password-request"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "upload-video",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "title",
+              "value": "Game of thrones",
+              "type": "text"
+            },
+            {
+              "key": "description",
+              "value": "My first video",
+              "type": "text"
+            },
+            {
+              "key": "video",
+              "type": "file",
+              "src": "/Users/apex/Downloads/WhatsApp Video 2024-06-22 at 22.09.35.mp4"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/videos/upload",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "videos", "upload"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "stream video",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Range",
+            "value": "byte=0-",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/api/videos/stream/667838997e69df3538036128",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "videos", "stream", "667838997e69df3538036128"],
+          "query": [
+            {
+              "key": "Range",
+              "value": "",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
