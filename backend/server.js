@@ -18,6 +18,7 @@ const allowedOrigins = [
   "https://6690b9a8e471f9c7493fb8c4--cute-cuchufli-b9e947.netlify.app",
   "https://66969e37c89110de29a269ea--cute-cuchufli-b9e947.netlify.app",
   "http://localhost:5173",
+  "https://669846fd9756525549df096b--cute-cuchufli-b9e947.netlify.app",
   // Add any other allowed origins here
 ];
 
