@@ -9,7 +9,8 @@ function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-
+  // const API_URL = "https://amalitech-project-6652.onrender.com/api";
+  const API_URL = "https://localhost:8000/api";
   const handleResetPassword = async () => {
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match");
@@ -21,13 +22,10 @@ function ResetPasswordPage() {
     setSuccess(false);
 
     try {
-      await axios.post(
-        "https://amalitech-project-6652.onrender.com/api/reset-password",
-        {
-          token,
-          password: newPassword,
-        }
-      );
+      await axios.post(`${API_URL}/reset-password`, {
+        token,
+        password: newPassword,
+      });
       setSuccess(true);
       alert("Password reset successful");
     } catch (error) {

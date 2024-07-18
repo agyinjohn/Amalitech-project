@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import CustomAlert from "./CustomAlert";
-const API_URL = "https://amalitech-project-6652.onrender.com/api/";
+// const API_URL = "https://amalitech-project-6652.onrender.com/api/";
+const API_URL = "http://localhost:8000/api/";
 function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -5,7 +5,8 @@ import LoadingIndicator from "./LoadingIndicator";
 import { useAuth } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "https://amalitech-project-6652.onrender.com/api/login";
+// const API_URL = "https://amalitech-project-6652.onrender.com/api/login";
+const API_URL = "http://localhost:8000/api/login";
 
 function LoginPage() {
   const [email, setEmail] = useState("");

@@ -5,12 +5,12 @@ import { useParams } from "react-router-dom";
 const VerifiedEmailPage = () => {
   const { token } = useParams();
   const [message, setMessage] = useState("Null");
+  // const API_URL = "https://amalitech-project-6652.onrender.com/api";
+  const API_URL = "https://localhost:8000/api";
   useEffect(() => {
     console.log(token);
     axios
-      .get(
-        `https://amalitech-project-6652.onrender.com/api/verify-email/${token}`
-      )
+      .get(`${API_URL}/verify-email/${token}`)
       .then((res) => setMessage(res.message))
       .catch((err) => setMessage(err.response.data.error));
   });

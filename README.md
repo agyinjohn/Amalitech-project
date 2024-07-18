@@ -51,6 +51,18 @@ Paul Leonard, a video creator, required a bespoke video hosting platform tailore
 - MongoDB
 - Firebase account
 
+## Step to install project
+
+- git clone https://github.com/agyinjohn/Amalitech-project.git
+- cd Amalitect-project
+- cd backend
+  - npm install
+  - npm run dev ---to start development sever
+  - cd ..
+- cd frontend
+  - npm install
+  - npm run dev
+
 # API Endpoints
 
 ## User Authentication
@@ -95,3 +107,12 @@ entity Admin {
 
 User ||--o{ Admin : "is"
 User ||--o{ Video : "uploads"
+
+# Firebase Service Accout
+
+- login to firebase console
+- create a new project
+- navigate to project setting
+- select service accout from the tab
+- click on generate private key
+- update the backend/utils/config/firebaseServiceAccount.json
