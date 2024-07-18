@@ -25,7 +25,7 @@ const app = express();
 // Middlewares for security purposes
 const allowedOrigins = [
   `${process.env.CLIENT_URL}`,
-  "https://amalitech-bespoke.netlify.app/",
+  "https://amalitech-bespoke.netlify.app",
 
   "http://localhost:5173",
 
