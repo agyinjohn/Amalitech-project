@@ -27,7 +27,12 @@ const VideoWidget = ({ src }) => {
 
   return (
     <div className="video-container-v">
-      <video ref={videoRef} controls className="video-element">
+      <video
+        crossorigin="anonymous"
+        ref={videoRef}
+        controls
+        className="video-element"
+      >
         <source src={src} type="video/mp4" />
         Your browser does not support the video tag.
       </video>

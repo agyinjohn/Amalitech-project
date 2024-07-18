@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "https://amalitech-project-6652.onrender.com/api/videos"; // Replace with your API URL
+// const API_URL = "https://amalitech-project-6652.onrender.com/api/videos"; //
+const API_URL = "http://localhost:8000/api/videos"; //
 
 const uploadVideo = async (formData, token) => {
   try {

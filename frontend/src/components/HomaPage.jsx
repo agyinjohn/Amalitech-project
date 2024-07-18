@@ -1,11 +1,12 @@
 import axios from "axios";
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-const HomaPage = () => {
+
+const HomePage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [id, setId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
   const fetchVideos = async () => {
     try {
       setIsLoading(true);
@@ -18,19 +19,24 @@ const HomaPage = () => {
           },
         }
       );
-      setId(res.data[currentIndex]["_id"]);
+      const videos = res.data;
+      localStorage.setItem("videos", JSON.stringify(videos)); // Store the video data in local storage
+      setId(videos[currentIndex]["_id"]);
       setIsLoading(false);
     } catch (err) {
       console.log(err);
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     fetchVideos();
   }, [currentIndex]);
+
   if (isLoading) {
     return <h1>Loading......</h1>;
   }
+
   return (
     <div>
       <div className="landing">
@@ -40,7 +46,7 @@ const HomaPage = () => {
         <div className="content-l">
           <p>Your go-to place for exclusive videos.</p>
           <Link
-            onClick={console.log("click")}
+            onClick={() => console.log("click")}
             to={`/videos/video/${id}`}
             className="button"
           >
@@ -52,4 +58,4 @@ const HomaPage = () => {
   );
 };
 
-export default HomaPage;
+export default HomePage;

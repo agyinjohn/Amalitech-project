@@ -4,21 +4,30 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 const errorHandler = require("./utils/errorHandler");
+const admin = require("firebase-admin");
 
-// const crypto = require("crypto");
+require("dotenv").config();
+// Initialize Firebase Admin SDK
+const serviceAccount = require("./utils/config/firebaseServiceAccount.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+});
+
+const bucket = admin.storage().bucket();
+
 const router = require("./routes/authRoutes");
 const Videorouter = require("./routes/videoRoute");
-require("dotenv").config();
+
 const app = express();
 
-// const jwtSecret = crypto.randomBytes(64).toString("hex");
-// console.log(jwtSecret);
-//Middlewares for security purposes
+// Middlewares for security purposes
 const allowedOrigins = [
-  "https://6690b9a8e471f9c7493fb8c4--cute-cuchufli-b9e947.netlify.app",
-  "https://66969e37c89110de29a269ea--cute-cuchufli-b9e947.netlify.app",
+  `${process.env.CLIENT_URL}`,
+
   "http://localhost:5173",
-  "https://669846fd9756525549df096b--cute-cuchufli-b9e947.netlify.app",
+
   // Add any other allowed origins here
 ];
 
@@ -40,21 +49,22 @@ app.use(helmet());
 app.use("/api", router);
 app.use("/api/videos", Videorouter);
 app.use(express.static(path.join(__dirname, "/public/dist")));
+
 let DB_URL = process.env.MONGODB_URL.replace("<password>", process.env.DB_PASS);
 mongoose
   .connect(DB_URL)
-  .then((res) => console.log("Successfull connection to database"))
+  .then((res) => console.log("Successful connection to database"))
   .catch((err) => {
     console.log("Connection failed");
   });
-// DB_URL.users.getIndexes();
 
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "index.html"));
 });
 
 app.use(errorHandler);
+
 const port = process.env.PORT || 8001;
 app.listen(port, () => {
-  console.log(`Server is listen on port ${port}`);
+  console.log(`Server is listening on port ${port}`);
 });

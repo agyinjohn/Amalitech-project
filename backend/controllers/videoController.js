@@ -2,14 +2,9 @@ const Video = require("../models/videoModel");
 const multer = require("multer");
 const admin = require("firebase-admin");
 const path = require("path");
-
-// Initialize Firebase Admin SDK
-const serviceAccount = require("../utils/config/firebaseServiceAccount.json");
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-});
+const {
+  generateCustomToken,
+} = require("../utils/middlewares/firebaaseAuth.js");
 
 const bucket = admin.storage().bucket();
 
@@ -28,50 +23,59 @@ exports.uploadVideo = [
       return res.status(400).send("No video file uploaded");
     }
 
-    const fileName = `videos/${Date.now()}_${path.basename(
-      videoFile.originalname
-    )}`;
-    const file = bucket.file(fileName);
+    try {
+      const uid = req.user.id; // Assuming user ID is available in the request object
+      const customToken = await generateCustomToken(uid);
 
-    const stream = file.createWriteStream({
-      metadata: {
-        contentType: videoFile.mimetype, // Set content type to ensure proper handling
+      const fileName = `videos/${Date.now()}_${path.basename(
+        videoFile.originalname
+      )}`;
+      const file = bucket.file(fileName);
+
+      const stream = file.createWriteStream({
         metadata: {
-          custom: {
-            description: "Video uploaded via Node.js",
-            title: title,
-            customDescription: description,
+          contentType: videoFile.mimetype,
+          metadata: {
+            firebaseStorageDownloadTokens: customToken,
+            custom: {
+              description: "Video uploaded via Node.js",
+              title: title,
+              customDescription: description,
+            },
           },
         },
-      },
-    });
+      });
 
-    stream.on("error", (err) => {
-      console.error(err);
-      return res.status(500).send("Error uploading file to Firebase Storage");
-    });
+      stream.on("error", (err) => {
+        console.error(err);
+        return res.status(500).send("Error uploading file to Firebase Storage");
+      });
 
-    stream.on("finish", async () => {
-      try {
-        await file.makePublic();
-        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${file.name}`;
+      stream.on("finish", async () => {
+        try {
+          await file.makePublic();
+          const publicUrl = `https://storage.googleapis.com/${bucket.name}/${file.name}`;
 
-        const video = await Video.create({
-          title,
-          description,
-          url: publicUrl,
-        });
-        res.status(201).json(video);
-      } catch (err) {
-        next(err); // Pass the error to the next middleware
-      }
-    });
+          const video = await Video.create({
+            title,
+            description,
+            url: publicUrl,
+          });
+          res.status(201).json(video);
+        } catch (err) {
+          next(err); // Pass the error to the next middleware
+        }
+      });
 
-    stream.end(videoFile.buffer);
+      stream.end(videoFile.buffer);
+    } catch (error) {
+      next(error);
+    }
   },
 ];
 
 exports.streamVideo = async (req, res, next) => {
+  let uid;
   try {
     const videoId = req.params.id; // Get the video ID from the request parameters
     const video = await Video.findById(videoId); // Find the video in the database by ID
@@ -79,11 +83,27 @@ exports.streamVideo = async (req, res, next) => {
     if (!video) {
       return res.status(404).send("Video not found"); // Return 404 if the video is not found
     }
+
+    if (req.headers.authorization) {
+      uid = req.headers.authorization.split(" ")[1];
+    } else {
+      uid =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2OTMwMTljNTQ0NTFlMjhhZTM3YWNmNiIsImlhdCI6MTcyMTMwMjM0OSwiZXhwIjoxNzIxMzA1OTQ5fQ.1Mg5_IAyuT_yVN1Fsj1NVmmRMM8HjwGHTR0X5bWn4HU";
+    }
+
+    const length = uid.length;
+    const half = Math.ceil(length / 2);
+
+    const firstPart = uid.slice(0, half);
+    console.log(firstPart);
+    const customToken = await generateCustomToken(firstPart);
+
     const url = video.url.split("/").pop();
     const file = bucket.file(`videos/${url}`); // Get the file from the bucket using the URL
     if (!file) {
       return res.status(404).send("File not found");
     }
+
     let range = req.headers.range; // Get the range header from the request
 
     const [metadata] = await file.getMetadata();
@@ -104,6 +124,7 @@ exports.streamVideo = async (req, res, next) => {
       "Accept-Ranges": "bytes",
       "Content-Length": chunksize,
       "Content-Type": "video/mp4",
+      Authorization: `Bearer ${customToken}`, // Attach the custom token
     };
 
     res.writeHead(206, head);
@@ -115,6 +136,7 @@ exports.streamVideo = async (req, res, next) => {
       })
       .pipe(res);
   } catch (err) {
+    // console.log(err);
     next(err); // Pass the error to the next middleware
   }
 };

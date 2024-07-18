@@ -21,9 +21,9 @@ function UploadPage() {
 
     setLoading(true);
     setError(null);
-
+    const token = localStorage.getItem("token");
     try {
-      await videoService.uploadVideo(formData);
+      await videoService.uploadVideo(formData, token);
       alert("Video uploaded successfully");
     } catch (error) {
       setError("Error uploading video");
